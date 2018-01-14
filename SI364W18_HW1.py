@@ -6,6 +6,9 @@
 
 ## List below here, in a comment/comments, the people you worked with on this assignment AND any resources you used to find code (50 point deduction for not doing so). If none, write "None".
 
+##https://pythonspot.com/flask-web-forms/
+##https://newsapi.org/
+##https://www.w3schools.com/html/html_form_elements.asp
 
 
 ## [PROBLEM 1] - 150 points
