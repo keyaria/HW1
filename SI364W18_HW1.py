@@ -11,17 +11,96 @@
 ## [PROBLEM 1] - 150 points
 ## Below is code for one of the simplest possible Flask applications. Edit the code so that once you run this application locally and go to the URL 'http://localhost:5000/class', you see a page that says "Welcome to SI 364!"
 
-from flask import Flask
+from flask import Flask, render_template, request, jsonify
+import requests
+from wtforms import Form, TextField, TextAreaField, validators, StringField, SubmitField
+import json
 app = Flask(__name__)
 app.debug = True
+class ReusableForm(Form):
 
-@app.route('/')
+	name = TextField('Enter your favorite number:')
+
+@app.route('/class')
 def hello_to_you():
-    return 'Hello!'
+	return 'Welcome to SI 364!'
 
+@app.route('/movie/<name>')
+def movie(name):
+	url = "https://itunes.apple.com/search"
+	param = {'term': name,}
+	search = requests.get(url=url, params=param)
+	return(search.text)
+
+
+@app.route('/question',methods = ['POST', 'GET'])
+def question():
+	form = ReusableForm(request.form)
+	return render_template('index.html', form=form)
+
+@app.route('/result',methods = ['POST', 'GET'])
+def result():
+	if request.method == 'POST':
+		ingredient = request.form['name']
+		return 'Double your favorite number is ' + str(2*int(ingredient))
+
+
+@app.route('/problem4form', methods = ['POST', 'GET'])
+def enterData():
+	s = """<!DOCTYPE html>
+			<html>
+			<body>
+			<form action = "" method = "POST"">
+			Key Words to search for:<br>
+			<input type="text" name="Name" >
+			<br>
+			Select country:<br>
+			  <input type="radio" name="country" value="us" checked> United States<br>
+  			 <input type="radio" name="country" value="cn"> China<br>
+    		 <input type="radio" name="country" value="in"> India<br>
+			Pick a topic or topics that interest you:
+			<br>
+			<input type="checkbox" name="info" value="business">business
+			<br>
+			<input type="checkbox" name="info" value="entertainment">entertainment
+			<br>
+			<input type="checkbox" name="info" value="general">general
+			<br>
+			<input type="checkbox" name="info" value="technology">tehnology
+			<br>
+			<input type="submit" value="Submit">
+			</form>
+			<h1> Top Headlines</h1>
+			</body>
+			</html>"""
+	if request.method == "POST":
+		#api_key =  "e66434811919412abc3ff3068d54f34c";
+		api_key= "31c8aa1a894949ffaeccfc4903fcacc7"
+		url = ('https://newsapi.org/v2/top-headlines?'
+       'apiKey=31c8aa1a894949ffaeccfc4903fcacc7')
+
+		param = {'country':request.form['country'], 'q': request.form['Name'], 'category':request.form['info']}
+		#search = (requests.get(url=url, headers=headers)).json()
+		search =(requests.get(url, params=param)).json()
+
+		se = list()
+		sl = list()
+		for i in search['articles']:
+			se.append(i['title'])
+			se.append(i['url'])
+
+
+		return s + request.form['Name'] + '<br> <br>'.join(se)
+
+	else:
+		return s
 
 if __name__ == '__main__':
-    app.run()
+	app.run(use_reloader=True, debug=True)
+
+
+
+
 
 
 ## [PROBLEM 2] - 250 points
